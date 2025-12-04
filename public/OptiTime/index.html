@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Horloge Décimale Avancée</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-neumorphism">
+	<div id="app-container">
+		<main id="clock-display-area">
+			<!-- Horloge locale -->
+			<div id="local-clock-section" class="clock-section">
+				<h3>Heure Locale</h3>
+				<div class="clock-pair">
+					<div class="clock-group">
+						<h4>Temps Décimal</h4>
+						<div class="analog-clock-container">
+							<div class="analog-clock decimal-clock">
+								<div class="clock-face">
+									<!-- Marqueurs pour horloge décimale (10 heures) -->
+									<div class="hour-markers decimal-markers"></div>
+									<div class="hand hour-hand" id="local-decimal-hour-hand"></div>
+									<div class="hand minute-hand" id="local-decimal-minute-hand"></div>
+									<div class="hand second-hand" id="local-decimal-second-hand"></div>
+									<div class="center-dot"></div>
+								</div>
+							</div>
+							<div class="digital-time" id="local-decimal-digital">0:00:00</div>
+						</div>
+					</div>
+					<div class="clock-group">
+						<h4>Temps Standard</h4>
+						<div class="analog-clock-container">
+							<div class="analog-clock standard-clock">
+								<div class="clock-face">
+									<!-- Marqueurs pour horloge standard (12 heures) -->
+									<div class="hour-markers standard-markers"></div>
+									<div class="hand hour-hand" id="local-standard-hour-hand"></div>
+									<div class="hand minute-hand" id="local-standard-minute-hand"></div>
+									<div class="hand second-hand" id="local-standard-second-hand"></div>
+									<div class="center-dot"></div>
+								</div>
+							</div>
+							<div class="digital-time" id="local-standard-digital">00:00:00</div>
+						</div>
+					</div>
+				</div>
+				<div class="location-info" id="local-location">Localisation en cours...</div>
+			</div>
+
+			<!-- (Gestion des horloges de villes supprimée — seul le fuseau local est affiché) -->
+
+			<div id="date-display"></div>
+		</main>
+	</div>
+	<script src="script.js"></script>
+</body>
+</html>

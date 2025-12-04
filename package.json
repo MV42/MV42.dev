@@ -1,0 +1,23 @@
+{
+  "name": "mv42-dev",
+  "version": "1.0.0",
+  "description": "Portfolio MV42 + Bot Discord + Widget Spotify",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "keywords": [
+    "portfolio",
+    "discord-bot",
+    "spotify"
+  ],
+  "author": "MV42",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.21.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

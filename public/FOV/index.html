@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Camera Ray Visualizer — Meridian Mode</title>
+  <style>
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial}
+    #app{display:flex;height:100%}
+    #ui{width:360px;padding:12px;box-sizing:border-box;background:#0f1724;color:#e6eef8;overflow:auto}
+    #canvas-wrap{flex:1;background:#071427;position:relative}
+    canvas{display:block;width:100%;height:100%}
+    label{display:block;margin-top:10px;font-size:13px;color:#cfe3ff}
+    input[type=range]{width:100%}
+    input[type=number]{width:100%;padding:6px;border-radius:4px;border:1px solid #233347;background:#0b1220;color:#e6eef8}
+    button{margin-top:12px;padding:8px;border-radius:6px;border:0;background:#1f6feb;color:white;cursor:pointer}
+  </style>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div id="app">
+    <div id="ui">
+      <h2>Camera Ray Visualizer</h2>
+      <label>Résolution X<input id="resX" type="number" min="1" max="128" value="32"></label>
+      <label>Résolution Y<input id="resY" type="number" min="1" max="128" value="24"></label>
+      <label>FOV: <span id="fovVal">60</span>°<input id="fov" type="range" min="1" max="360" step="1" value="60"></label>
+      <label>Longueur des rayons<input id="rayLen" type="range" min="1" max="10" step="0.1" value="4"></label>
+      <button id="applyBtn">Appliquer</button>
+    </div>
+    <div id="canvas-wrap"><canvas id="c"></canvas></div>
+  </div>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+
+    const canvas=document.getElementById('c');
+    const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+    const scene=new THREE.Scene();
+    const camera=new THREE.PerspectiveCamera(60,2,0.01,1000);
+    camera.position.set(0,0,8);
+    const controls=new OrbitControls(camera,renderer.domElement);
+
+    const originSphere=new THREE.Mesh(new THREE.SphereGeometry(0.04,12,12), new THREE.MeshBasicMaterial({color:0xffffff}));
+    scene.add(originSphere);
+
+    let rayLines=null,viewportGrid=null;
+    const resXIn=document.getElementById('resX');
+    const resYIn=document.getElementById('resY');
+    const fovIn=document.getElementById('fov');
+    const fovVal=document.getElementById('fovVal');
+    const rayLenIn=document.getElementById('rayLen');
+    document.getElementById('applyBtn').addEventListener('click',rebuild);
+    fovIn.addEventListener('input',()=>{fovVal.textContent=fovIn.value;});
+
+    window.addEventListener('resize',resize);
+    function resize(){renderer.setSize(window.innerWidth-360,window.innerHeight);camera.aspect=(window.innerWidth-360)/window.innerHeight;camera.updateProjectionMatrix();}
+
+    function directionForPixel(u,v,fovDeg,aspect){
+      const fovRad=THREE.MathUtils.degToRad(fovDeg);
+      if(fovDeg<=180){
+        const halfV=fovRad/2;
+        const halfH=Math.atan(Math.tan(halfV)*aspect);
+        const angleX=u*halfH;
+        const angleY=v*halfV;
+        const dx=Math.sin(angleX)*Math.cos(angleY);
+        const dy=Math.sin(angleY);
+        const dz=-Math.cos(angleX)*Math.cos(angleY);
+        return new THREE.Vector3(dx,dy,dz).normalize();
+      } else {
+        // Projection méridienne : u => longitude, v => latitude
+        const maxLon=fovRad; // longitude s'étend avec FOV
+        const lon=u*maxLon/2; // -maxLon/2 .. +maxLon/2
+        const lat=v*Math.PI/2; // -90° .. +90°
+        const dx=Math.cos(lat)*Math.sin(lon);
+        const dy=Math.sin(lat);
+        const dz=-Math.cos(lat)*Math.cos(lon);
+        return new THREE.Vector3(dx,dy,dz).normalize();
+      }
+    }
+
+    function rebuild(){
+      if(rayLines){scene.remove(rayLines);rayLines.geometry.dispose();rayLines.material.dispose();}
+      if(viewportGrid){scene.remove(viewportGrid);viewportGrid.geometry.dispose();viewportGrid.material.dispose();}
+
+      let resX=parseInt(resXIn.value)||32,resY=parseInt(resYIn.value)||24;
+      let fovDeg=parseFloat(fovIn.value),rayLen=parseFloat(rayLenIn.value);
+      const aspect=resX/resY;
+
+      const num=resX*resY;
+      const pos=new Float32Array(num*2*3);
+      const col=new Float32Array(num*2*3);
+
+      let p=0;
+      for(let j=0;j<resY;j++){
+        for(let i=0;i<resX;i++){
+          const u=(i+0.5)/resX*2-1;
+          const v=(j+0.5)/resY*2-1;
+          const dir=directionForPixel(u,v,fovDeg,aspect);
+          const start=new THREE.Color(0x00ff00),end=new THREE.Color(0xff0000);
+          pos[p]=0;pos[p+1]=0;pos[p+2]=0;col[p]=start.r;col[p+1]=start.g;col[p+2]=start.b;
+          pos[p+3]=dir.x*rayLen;pos[p+4]=dir.y*rayLen;pos[p+5]=dir.z*rayLen;col[p+3]=end.r;col[p+4]=end.g;col[p+5]=end.b;
+          p+=6;
+        }
+      }
+      const geom=new THREE.BufferGeometry();geom.setAttribute('position',new THREE.BufferAttribute(pos,3));geom.setAttribute('color',new THREE.BufferAttribute(col,3));
+      rayLines=new THREE.LineSegments(geom,new THREE.LineBasicMaterial({vertexColors:true}));scene.add(rayLines);
+
+      // viewport grid
+      const gridPos=[];
+      for(let j=0;j<=resY;j++){
+        for(let i=0;i<=resX;i++){
+          const u=i/resX*2-1;
+          const v=j/resY*2-1;
+          const dir=directionForPixel(u,v,fovDeg,aspect);
+          gridPos.push(dir.x*rayLen,dir.y*rayLen,dir.z*rayLen);
+        }
+      }
+      const gridIdx=[];
+      for(let j=0;j<resY;j++){
+        for(let i=0;i<resX;i++){
+          const idx=j*(resX+1)+i;
+          const a=idx;const b=idx+1;const c=idx+(resX+1);const d=c+1;
+          gridIdx.push(a,b,a,c,b,d,c,d);
+        }
+      }
+      const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(gridPos,3));g.setIndex(gridIdx);
+      viewportGrid=new THREE.LineSegments(g,new THREE.LineBasicMaterial({color:0x3399ff,transparent:true,opacity:0.3}));scene.add(viewportGrid);
+    }
+
+    resize();
+    rebuild();
+    function animate(){requestAnimationFrame(animate);controls.update();renderer.render(scene,camera);}animate();
+  </script>
+</body>
+</html>
