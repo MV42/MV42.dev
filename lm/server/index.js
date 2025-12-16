@@ -28,7 +28,10 @@ const CREDENTIALS = {
 };
 
 // Stockage (Tokens + Historique)
-storage.initSync({ dir: path.join(__dirname, 'persist') });
+// On initialise dans une fonction async car initSync n'existe plus dans les versions récentes
+async function initStorage() {
+    await storage.init({ dir: path.join(__dirname, 'persist') });
+}
 
 const spotifyApi = new SpotifyWebApi(CREDENTIALS);
 
@@ -145,7 +148,8 @@ router.get('/api/history', async (req, res) => {
 
 module.exports = {
     router,
-    startPollingLoop
+    startPollingLoop,
+    initStorage
 };
 
 // --- BOUCLE DE SURVEILLANCE (POLLING) ---

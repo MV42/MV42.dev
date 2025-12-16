@@ -11,21 +11,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Monter le serveur Spotify sur /lm
 app.use('/lm', spotifyServer.router);
 
-// Démarrer le polling Spotify
-spotifyServer.startPollingLoop();
-
-// Route principale - sert index.html
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// Gestion des erreurs 404
-app.use((req, res) => {
-    res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
-});
-
 // Démarrage du serveur
-app.listen(PORT, () => {
-    console.log(`🚀 Serveur MV42.dev démarré sur le port ${PORT}`);
-    console.log(`📁 Fichiers statiques servis depuis /public`);
-});
+(async () => {
+    try {
+        // Initialisation du stockage Spotify (Async)
+        await spotifyServer.initStorage();
+        
+        // Lancer la boucle de surveillance
+        spotifyServer.startPollingLoop();
+
+        app.listen(PORT, () => {
+            console.log(`🚀 Serveur MV42.dev démarré sur le port ${PORT}`);
+            console.log(`📁 Fichiers statiques servis depuis /public`);
+        });
+    } catch (e) {
+        console.error("Erreur au démarrage:", e);
+    }
+})();
