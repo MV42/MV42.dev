@@ -1,30 +1,41 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
+
+// Import des modules (Apps)
 const spotifyServer = require('./lm/server/index.js');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Servir les fichiers statiques depuis le dossier 'public'
-app.use(express.static(path.join(__dirname, 'public')));
+// --- MONTAGE DES APPS ---
 
-// Monter le serveur Spotify sur /lm
+// 1. Spotify Widget (/lm)
 app.use('/lm', spotifyServer.router);
 
-// Démarrage du serveur
+// 2. (Futur) ChatCast
+// const chatCastServer = require('./chatcast/server.js');
+// app.use('/chatcast', chatCastServer);
+
+
+// --- DÉMARRAGE ---
 (async () => {
     try {
-        // Initialisation du stockage Spotify (Async)
-        await spotifyServer.initStorage();
-        
-        // Lancer la boucle de surveillance
-        spotifyServer.startPollingLoop();
+        console.log("🚀 Démarrage du serveur VPS (Apps Only)...");
 
+        // Initialisation Spotify
+        await spotifyServer.initStorage();
+        spotifyServer.startPollingLoop();
+        console.log("✅ Spotify Widget chargé sur /lm");
+
+        // Démarrage Express
         app.listen(PORT, () => {
-            console.log(`🚀 Serveur MV42.dev démarré sur le port ${PORT}`);
-            console.log(`📁 Fichiers statiques servis depuis /public`);
+            console.log(`\n🌍 Serveur Apps en ligne sur le port ${PORT}`);
+            console.log(`👉 Spotify: http://localhost:${PORT}/lm/login`);
         });
+
     } catch (e) {
-        console.error("Erreur au démarrage:", e);
+        console.error("❌ Erreur fatale au démarrage:", e);
+        process.exit(1);
     }
 })();
