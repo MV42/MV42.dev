@@ -5,9 +5,19 @@ const admin = require('firebase-admin');
 const path = require('path');
 
 // --- FIREBASE SETUP ---
+let serviceAccount;
 try {
-    // On cherche le fichier dans le dossier courant (lm/server)
-    const serviceAccount = require(path.join(__dirname, 'serviceAccountKey.json'));
+    // 1. Essai via Variable d'environnement (Recommandé pour Infomaniak)
+    if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+        serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+        console.log("Configuration Firebase chargée depuis la variable d'environnement.");
+    } 
+    // 2. Essai via fichier local
+    else {
+        serviceAccount = require(path.join(__dirname, 'serviceAccountKey.json'));
+        console.log("Configuration Firebase chargée depuis le fichier JSON.");
+    }
+
     if (admin.apps.length === 0) {
         admin.initializeApp({
             credential: admin.credential.cert(serviceAccount)
@@ -15,7 +25,7 @@ try {
         console.log("Firebase Admin initialisé !");
     }
 } catch (e) {
-    console.log("Attention: Firebase non configuré (serviceAccountKey.json manquant). Le Push ne marchera pas.");
+    console.log("Attention: Firebase non configuré. Le Push ne marchera pas. Erreur:", e.message);
 }
 
 const router = express.Router();
