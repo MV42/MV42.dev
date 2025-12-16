@@ -32,9 +32,9 @@ const router = express.Router();
 
 // CONFIGURATION
 const CREDENTIALS = {
-    clientId: 'TON_CLIENT_ID_ICI',
-    clientSecret: 'TON_CLIENT_SECRET_ICI',
-    redirectUri: 'https://mv42.dev/lm/callback'
+    clientId: process.env.SPOTIFY_CLIENT_ID || 'TON_CLIENT_ID_ICI',
+    clientSecret: process.env.SPOTIFY_CLIENT_SECRET || 'TON_CLIENT_SECRET_ICI',
+    redirectUri: process.env.SPOTIFY_REDIRECT_URI || 'https://mv42.dev/lm/callback'
 };
 
 // Stockage (Tokens + Historique)
