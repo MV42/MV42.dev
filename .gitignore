@@ -22,3 +22,7 @@ Thumbs.db
 # Build output (si ajouté plus tard)
 dist/
 build/
+
+# Secrets
+lm/server/serviceAccountKey.json
+lm/android/app/google-services.json
