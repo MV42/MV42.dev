@@ -2,46 +2,46 @@ const express = require('express');
 const SpotifyWebApi = require('spotify-web-api-node');
 const storage = require('node-persist');
 const admin = require('firebase-admin');
+const path = require('path');
 
 // --- FIREBASE SETUP ---
-// Tu devras télécharger ton fichier serviceAccountKey.json depuis la console Firebase
-// et le mettre dans le dossier server/
 try {
-    const serviceAccount = require('./serviceAccountKey.json');
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount)
-    });
-    console.log("Firebase Admin initialisé !");
+    // On cherche le fichier dans le dossier courant (lm/server)
+    const serviceAccount = require(path.join(__dirname, 'serviceAccountKey.json'));
+    if (admin.apps.length === 0) {
+        admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount)
+        });
+        console.log("Firebase Admin initialisé !");
+    }
 } catch (e) {
     console.log("Attention: Firebase non configuré (serviceAccountKey.json manquant). Le Push ne marchera pas.");
 }
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+const router = express.Router();
 
 // CONFIGURATION
 const CREDENTIALS = {
     clientId: 'TON_CLIENT_ID_ICI',
     clientSecret: 'TON_CLIENT_SECRET_ICI',
-    redirectUri: 'https://mv42.dev/lm/callback' // Attention à mettre la bonne URL
+    redirectUri: 'https://mv42.dev/lm/callback'
 };
 
 // Stockage (Tokens + Historique)
-// On utilise node-persist pour simuler une base de donnée simple
-storage.initSync();
+storage.initSync({ dir: path.join(__dirname, 'persist') });
 
 const spotifyApi = new SpotifyWebApi(CREDENTIALS);
 
 // --- ROUTES ---
 
-// 1. Route pour se connecter (Toi et Elle devrez cliquer dessus une fois)
-app.get('/login', (req, res) => {
+// 1. Route pour se connecter
+router.get('/login', (req, res) => {
     const scopes = ['user-read-playback-state', 'user-read-currently-playing'];
     res.redirect(spotifyApi.createAuthorizeURL(scopes));
 });
 
 // 2. Le retour de Spotify après connexion
-app.get('/callback', async (req, res) => {
+router.get('/callback', async (req, res) => {
     const error = req.query.error;
     const code = req.query.code;
 
@@ -71,7 +71,7 @@ app.get('/callback', async (req, res) => {
 });
 
 // 3. API pour le Widget Android : Récupère ce que les deux écoutent
-app.get('/api/status', async (req, res) => {
+router.get('/api/status', async (req, res) => {
     const users = await storage.keys(); // Récupère les clés stockées
     const userKeys = users.filter(k => k.startsWith('user_'));
     
@@ -126,7 +126,7 @@ app.get('/api/status', async (req, res) => {
 });
 
 // 4. API pour l'Historique (App)
-app.get('/api/history', async (req, res) => {
+router.get('/api/history', async (req, res) => {
     // Récupère tout l'historique
     const keys = await storage.keys();
     const historyKeys = keys.filter(k => k.startsWith('history_'));
@@ -143,15 +143,15 @@ app.get('/api/history', async (req, res) => {
     res.json(combinedHistory);
 });
 
-app.listen(PORT, () => {
-    console.log(`Serveur lancé sur le port ${PORT}`);
-    // Lancer la boucle de surveillance
-    startPollingLoop();
-});
+module.exports = {
+    router,
+    startPollingLoop
+};
 
 // --- BOUCLE DE SURVEILLANCE (POLLING) ---
 // C'est le serveur qui travaille, pas le téléphone !
 async function startPollingLoop() {
+    console.log("Démarrage de la surveillance Spotify...");
     setInterval(async () => {
         try {
             const users = await storage.keys();
