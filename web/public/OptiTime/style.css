@@ -1,0 +1,552 @@
+/* Styles globaux et variables de thème */
+:root {
+    --bg: #e0e5ec;
+    --card-bg: #e0e5ec;
+    --text: #333333;
+    --muted: #6b7280;
+    --border: rgba(0,0,0,0.06);
+    --input-bg: rgba(255,255,255,0.7);
+    --input-border: rgba(0,0,0,0.08);
+    --analog-bg: rgba(255,255,255,0.1);
+    --analog-border: rgba(0,0,0,0.06);
+    --hand-color: #333333;
+    --dial-number: #555555;
+    --accent: #3b82f6;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    color: var(--text);
+    font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+    margin: 0;
+    padding: 20px;
+    overflow: auto;
+    transition: background-image 0.5s ease, background-color 0.5s ease;
+    background-color: var(--bg);
+}
+
+#app-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    width: 100%;
+    max-width: 1200px;
+}
+
+header#controls {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    width: 100%;
+    padding: 15px;
+    background: var(--card-bg);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.control-group label {
+    font-size: 0.9em;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.control-group select, 
+.control-group button {
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid var(--input-border, rgba(0,0,0,0.08));
+    background-color: var(--input-bg, rgba(255,255,255,0.7));
+    color: var(--text);
+    font-size: 0.9em;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.control-group select:hover,
+.control-group button:hover {
+    filter: brightness(0.98);
+}
+
+.control-group select option {
+    background-color: #333;
+    color: #fff;
+}
+
+/* City input/button removed — styles omitted */
+
+/* Styles pour l'horloge locale */
+#local-clock-section {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 25px;
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--border);
+    width: 100%;
+    max-width: 600px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+#local-clock-section h3 {
+    margin: 0 0 20px 0;
+    color: var(--text);
+    font-size: 1.6em;
+    font-weight: 600;
+}
+
+.clock-section .clock-pair {
+    display: flex;
+    gap: 30px;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.clock-section .clock-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    flex: 1;
+}
+
+.clock-section .clock-group h4 {
+    margin: 0;
+    color: var(--text);
+    font-size: 1.1em;
+    font-weight: 500;
+}
+
+.clock-section .analog-clock-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.clock-section .analog-clock {
+    width: 150px;
+    height: 150px;
+    position: relative;
+    border-radius: 50%;
+    background: var(--analog-bg);
+    border: 3px solid var(--analog-border);
+    backdrop-filter: blur(10px);
+}
+
+.clock-section .digital-time {
+    font-size: 1.2em;
+    font-weight: 600;
+    color: var(--text);
+    font-family: 'Courier New', monospace;
+    padding: 10px 15px;
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    min-width: 120px;
+    text-align: center;
+}
+
+.location-info {
+    font-size: 0.9em;
+    color: var(--muted);
+    margin-top: 15px;
+    font-style: italic;
+}
+
+#date-display {
+    font-size: 1.1em;
+    color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    margin: 20px 0;
+    font-weight: 500;
+}
+
+/* Style pour chaque carte d'horloge de ville */
+.city-clock-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 25px;
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--border);
+    width: 100%;
+    max-width: 400px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.city-clock-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.city-header {
+    text-align: center;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.city-name {
+    font-size: 1.4em;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 5px;
+}
+
+.city-date {
+    font-size: 0.9em;
+    color: var(--muted);
+}
+
+/* .remove-city-button styles removed (no longer used) */
+
+/* Container des deux horloges (décimal et standard) */
+.dual-clocks-container {
+    display: flex;
+    gap: 20px;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+/* Style des horloges analogiques */
+.analog-clock-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+}
+
+.analog-clock {
+    width: 120px;
+    height: 120px;
+    position: relative;
+    border-radius: 50%;
+    background: var(--analog-bg);
+    border: 2px solid var(--analog-border);
+    backdrop-filter: blur(10px);
+}
+
+.clock-face {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    border-radius: 50%;
+}
+
+/* Numéros sur le cadran */
+.clock-number {
+    position: absolute;
+    color: var(--dial-number);
+    font-size: 11px;
+    font-weight: 700;
+    transform-origin: center;
+    text-align: center;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.08);
+    user-select: none;
+    z-index: 5;
+}
+
+/* Aiguilles */
+.hand {
+    position: absolute;
+    background: var(--hand-color);
+    transform-origin: bottom center;
+    border-radius: 2px;
+    transition: transform 0.1s ease-out;
+    left: 50%;
+    z-index: 3;
+}
+
+.hour-hand {
+    width: 4px;
+    height: 35px;
+    top: calc(50% - 35px);
+    margin-left: -2px;
+    background: var(--hand-color);
+}
+
+.minute-hand {
+    width: 3px;
+    height: 45px;
+    top: calc(50% - 45px);
+    margin-left: -1.5px;
+    background: var(--hand-color);
+}
+
+.second-hand {
+    width: 1px;
+    height: 50px;
+    top: calc(50% - 50px);
+    margin-left: -0.5px;
+    background: #ff4757;
+    z-index: 4;
+}
+
+.center-dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    background: var(--hand-color);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+/* Labels des horloges */
+.clock-label {
+    font-size: 0.85em;
+    color: var(--muted);
+    text-align: center;
+    font-weight: 500;
+}
+
+/* Affichage numérique */
+.digital-time-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.digital-time {
+    text-align: center;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+.digital-time .time-type {
+    font-size: 0.8em;
+    color: var(--muted);
+    margin-bottom: 2px;
+}
+
+.digital-time .time-value {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: var(--text);
+    font-family: 'Courier New', monospace;
+}
+
+/* Container principal des horloges */
+#city-clocks-container {
+    display: none; /* Container for city clocks removed; kept hidden in case of future reuse */
+}
+
+/* Styles pour les nouvelles fonctionnalités interactives */
+section#interactive-features {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    margin-top: 30px;
+    width: 100%;
+}
+
+#system-comparison {
+    width: 100%;
+    padding: 20px;
+    background: var(--card-bg);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+}
+
+#system-comparison h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: var(--text);
+    font-size: 1.4em;
+}
+
+#system-comparison table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+#system-comparison th,
+#system-comparison td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+}
+
+#system-comparison th {
+    background-color: rgba(0,0,0,0.03);
+    font-weight: 600;
+    color: var(--text);
+}
+
+/* --- Thème Neumorphism (seul thème conservé) --- */
+body.theme-neumorphism {
+    background-color: #e0e5ec;
+    color: #555;
+}
+
+.theme-neumorphism .city-clock-card {
+    background: #e0e5ec;
+    box-shadow: 9px 9px 16px #a3b1c6, -9px -9px 16px #ffffff;
+    border: none;
+}
+
+.theme-neumorphism .city-name {
+    color: #3b82f6;
+}
+
+.theme-neumorphism .city-date {
+    color: #6b7280;
+}
+
+.theme-neumorphism .clock-label {
+    color: #888;
+}
+
+.theme-neumorphism .digital-time .time-type {
+    color: #888;
+}
+
+.theme-neumorphism .digital-time .time-value {
+    color: #555;
+}
+
+
+/* Control-group and input/button styles removed (UI simplified) */
+
+.theme-neumorphism .clock-number {
+    color: #555;
+    text-shadow: 1px 1px 1px #ffffff;
+}
+
+.theme-neumorphism #local-clock-section {
+    background: #e0e5ec;
+    box-shadow: 9px 9px 16px #a3b1c6, -9px -9px 16px #ffffff;
+    border: none;
+}
+
+/* Color variables for Neumorphism light theme (applied when body has .theme-neumorphism) */
+body.theme-neumorphism {
+    --bg: #e0e5ec;
+    --card-bg: #e0e5ec;
+    --text: #555555;
+    --muted: #888888;
+    --hand-color: #333333;
+    --dial-number: #555555;
+    --accent: #3b82f6;
+    background-color: var(--bg);
+    color: var(--text);
+}
+
+/* Dark-mode automatic switch: prefers-color-scheme */
+@media (prefers-color-scheme: dark) {
+    body.theme-neumorphism {
+        --bg: #0f1720;
+        --card-bg: rgba(18, 20, 24, 0.8);
+        --text: #e6eef6;
+        --muted: rgba(230,230,230,0.7);
+        --hand-color: #f3f4f6;
+        --dial-number: #e6eef6;
+        --accent: #60a5fa;
+        background-color: var(--bg);
+        color: var(--text);
+    }
+
+    /* Cards and containers */
+    .theme-neumorphism #local-clock-section,
+    #system-comparison {
+        background: var(--card-bg);
+        border: 1px solid rgba(255,255,255,0.06);
+        box-shadow: none;
+    }
+
+    .theme-neumorphism .digital-time {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.06);
+        color: var(--text);
+    }
+
+    .control-group label,
+    .clock-section .clock-group h4,
+    #system-comparison th,
+    #system-comparison td,
+    .city-name,
+    .city-date,
+    .clock-label,
+    .location-info,
+    #date-display {
+        color: var(--text);
+    }
+
+    .analog-clock {
+        background: rgba(255,255,255,0.03);
+        border-color: rgba(255,255,255,0.06);
+    }
+}
+
+.theme-neumorphism #local-clock-section h3 {
+    color: #555;
+}
+
+.theme-neumorphism .clock-section .clock-group h4 {
+    color: #666;
+}
+
+.theme-neumorphism .clock-section .digital-time {
+    background: #e0e5ec;
+    color: #555;
+    box-shadow: inset 2px 2px 5px #b8c6d9, inset -2px -2px 5px #ffffff;
+    border: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .clock-section .clock-pair {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .dual-clocks-container {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .clock-section .analog-clock {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .analog-clock {
+        width: 100px;
+        height: 100px;
+    }
+    
+    header#controls {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    #city-clocks-container {
+        grid-template-columns: 1fr;
+    }
+}

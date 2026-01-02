@@ -69,11 +69,13 @@ router.get('/callback', async (req, res) => {
         spotifyApi.setAccessToken(accessToken);
         const me = await spotifyApi.getMe();
         const userId = me.body.id; // Ton ID Spotify ou le sien
+        const avatar = me.body.images && me.body.images.length > 0 ? me.body.images[0].url : null;
 
         // On sauvegarde les tokens de cet utilisateur
         await storage.setItem(`user_${userId}`, {
             refreshToken,
             name: me.body.display_name,
+            avatar,
             lastTrack: null
         });
 
@@ -101,6 +103,18 @@ router.get('/api/status', async (req, res) => {
             const data = await userApi.refreshAccessToken();
             userApi.setAccessToken(data.body['access_token']);
 
+            // Si l'avatar n'existe pas, on le récupère maintenant
+            if (!userData.avatar) {
+                try {
+                    const me = await userApi.getMe();
+                    if (me.body.images && me.body.images.length > 0) {
+                        userData.avatar = me.body.images[0].url;
+                        await storage.setItem(key, userData);
+                        console.log(`Avatar récupéré pour ${userData.name}`);
+                    }
+                } catch (e) { /* ignore */ }
+            }
+
             // Qu'est-ce qu'il écoute ?
             const playback = await userApi.getMyCurrentPlayingTrack();
             
@@ -111,9 +125,12 @@ router.get('/api/status', async (req, res) => {
                     artist: track.artists[0].name,
                     image: track.album.images[0].url,
                     isPlaying: playback.body.is_playing,
+                    uri: track.uri, // spotify:track:xxx pour ouvrir dans Spotify
                     progress_ms: playback.body.progress_ms,
                     duration_ms: track.duration_ms,
-                    timestamp: Date.now()
+                    timestamp: Date.now(),
+                    user: userData.name, // Ajouter le nom de l'utilisateur
+                    userImage: userData.avatar || null
                 };
 
                 result[userData.name] = trackData;
@@ -129,7 +146,7 @@ router.get('/api/status', async (req, res) => {
                     await storage.setItem(key, userData);
                 }
             } else {
-                result[userData.name] = { isPlaying: false, ...userData.lastTrack }; // On renvoie le dernier connu
+                result[userData.name] = { isPlaying: false, userImage: userData.avatar || null, ...userData.lastTrack }; // On renvoie le dernier connu
             }
         } catch (err) {
             console.error(`Erreur pour ${userData.name}:`, err);
@@ -147,8 +164,16 @@ router.get('/api/history', async (req, res) => {
     
     for (const key of historyKeys) {
          const list = await storage.getItem(key);
-         // On peut ajouter le nom de l'user si besoin
-         combinedHistory = combinedHistory.concat(list);
+         // Ajouter le nom de l'utilisateur si pas déjà présent
+         const userKey = key.replace('history_', '');
+         const userData = await storage.getItem(userKey);
+         const userName = userData?.name || 'Inconnu';
+         
+         const listWithUser = list.map(item => ({
+             ...item,
+             user: item.user || userName
+         }));
+         combinedHistory = combinedHistory.concat(listWithUser);
     }
     
     // Tri par date

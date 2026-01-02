@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page non trouvée | MV42</title>
+    <link rel="stylesheet" href="/portfolio.css">
+    <style>
+        .error-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 2rem;
+        }
+        .error-code {
+            font-size: 8rem;
+            font-weight: bold;
+            color: #e94560;
+            margin-bottom: 1rem;
+        }
+        .error-message {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .back-link {
+            color: #e94560;
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border: 2px solid #e94560;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .back-link:hover {
+            background: #e94560;
+            color: #1a1a2e;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-code">404</div>
+        <p class="error-message">Oups ! Cette page n'existe pas.</p>
+        <a href="/" class="back-link">Retour à l'accueil</a>
+    </div>
+</body>
+</html>
