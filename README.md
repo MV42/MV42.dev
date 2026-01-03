@@ -1,148 +1,99 @@
 # MV42.dev
 
-**Unified VPS architecture** - Portfolio + Apps on a single DigitalOcean VPS ($4/month).
+**Personal portfolio and web services platform** hosted on a DigitalOcean VPS.
 
-## 🏗️ Architecture
+---
 
-**1 repo • 1 server • 1 source of truth**
+## 🌐 Live Sites
+
+### [mv42.dev](https://mv42.dev)
+Portal homepage with links to Apps and Web spaces.
+
+### [web.mv42.dev](https://web.mv42.dev)
+Web projects gallery featuring:
+- **Portfolio** — Main landing page
+- **[CV](https://web.mv42.dev/CV/)** — Interactive curriculum vitae
+- **[FOV Calculator](https://web.mv42.dev/FOV/)** — Field of View calculator for gaming/simulation
+- **[OptiTime](https://web.mv42.dev/OptiTime/)** — Time optimization and scheduling tool
+
+### [app.mv42.dev](https://app.mv42.dev)
+Applications and services:
+- **[Spotify Widget](https://app.mv42.dev/lm/login)** — Real-time music listening tracker
+- More apps coming soon...
+
+---
+
+## 🏗️ Tech Stack
+
+- **Backend**: Node.js + Express
+- **Frontend**: Vanilla HTML/CSS/JS (zero build)
+- **Hosting**: DigitalOcean VPS ($4/month)
+- **Proxy**: Nginx with SSL (Let's Encrypt)
+- **Process Manager**: PM2
+- **CI/CD**: GitHub Actions (auto-deploy on push)
+
+---
+
+## 🚀 Features
+
+- **Host-based routing** — Portal serves different content based on subdomain
+- **Static first** — No build process, fast and lightweight
+- **Auto-deployment** — Push to `main` → instant deploy
+- **SSL everywhere** — Single certificate for all domains
+- **Modular architecture** — Easy to add new projects/services
+
+---
+
+## 📂 Repository Structure
 
 ```
 MV42.dev/
-├── index.js              # Unified Express server
-├── package.json          # All dependencies
-├── .env                  # Environment variables (not committed)
+├── index.js              # Unified Node.js server
+├── package.json          # Dependencies
 │
 ├── app/                  # Application modules
 │   └── lm/               # Spotify "Last Music" widget
-│       └── server/
-│           ├── index.js
-│           └── persist/  # Token storage (gitignored)
 │
-├── web/                  # Static portfolio
+├── web/                  # Static web projects
 │   └── public/
-│       ├── index.html
-│       ├── portfolio.css
-│       ├── CV/
-│       ├── FOV/
-│       └── OptiTime/
+│       ├── portal.html          # Portal page
+│       ├── web-gallery.html     # Web projects index
+│       ├── app-gallery.html     # Apps index
+│       ├── index.html           # Portfolio landing
+│       ├── CV/                  # CV project
+│       ├── FOV/                 # FOV Calculator
+│       └── OptiTime/            # OptiTime tool
 │
 ├── deploy/               # Deployment automation
-│   ├── ecosystem.config.js   # PM2 configuration
-│   ├── deploy.sh             # Auto-deploy script
-│   └── webhook.json          # GitHub webhook config
+│   ├── ecosystem.config.js      # PM2 configuration
+│   ├── deploy.sh                # Deploy script
+│   └── webhook.json             # Webhook config
 │
-└── nginx/                # Reverse proxy config
-    └── mv42.conf         # Nginx site configuration
+├── nginx/                # Nginx reverse proxy config
+│   └── mv42.conf
+│
+└── .github/workflows/    # GitHub Actions CI/CD
+    └── deploy.yml
 ```
 
-## 🌐 Routing
+---
 
-Single Node.js server (port 3000) with host-based landing pages:
+## 💻 For Developers
 
-- **mv42.dev** → Portal (links to App & Web spaces)
-- **app.mv42.dev** → Apps gallery (`app-gallery.html`) + Spotify widget (`/lm`)
-- **web.mv42.dev** → Web projects gallery (`web-gallery.html`) + portfolio static files
-- **mv42.dev/hooks/** → Webhook endpoint (internal)
+See **[DEV.md](./DEV.md)** for:
+- VPS setup instructions
+- Deployment guide
+- GitHub Actions configuration
+- Maintenance and troubleshooting
 
-Nginx handles SSL termination and proxies to port 3000 for all hosts.
-
-## 🚀 Local Development
-
-```bash
-git clone https://github.com/MV42/MV42.dev.git
-cd MV42.dev
-npm install
-cp .env.example .env  # Create and configure
-npm start
-```
-
-Server starts on `http://localhost:3000`
-
-## 📦 Production Deployment
-
-### Initial Setup (VPS)
-
-```bash
-# 1. Clone repository
-cd /srv
-git clone https://github.com/MV42/MV42.dev.git mv42
-cd /srv/mv42
-
-# 2. Install dependencies
-npm install --omit=dev
-
-# 3. Create sensitive files
-nano .env
-nano app/lm/server/serviceAccountKey.json
-
-# 4. Start with PM2
-pm2 start deploy/ecosystem.config.js
-pm2 save
-pm2 startup
-
-# 5. Configure Nginx
-sudo cp nginx/mv42.conf /etc/nginx/sites-available/mv42
-sudo ln -s /etc/nginx/sites-available/mv42 /etc/nginx/sites-enabled/
-sudo nginx -t && sudo systemctl reload nginx
-
-# 6. Setup webhook listener
-sudo apt install -y webhook
-webhook -hooks /srv/mv42/deploy/webhook.json -port 9000 -daemon
-
-# 7. Make deploy script executable
-chmod +x deploy/deploy.sh
-```
-
-### GitHub Webhook Setup
-
-1. Go to **Settings → Webhooks** on GitHub
-2. Add webhook:
-   - URL: `https://mv42.dev/hooks/mv42-deploy`
-   - Content type: `application/json`
-   - Secret: Same as in `deploy/webhook.json`
-   - Events: `push` on `main` branch
-
-### Auto-deployment
-
-Every push to `main` triggers automatic deployment:
-
-```bash
-git push origin main
-# → GitHub webhook → deploy.sh → git pull → npm install → pm2 reload
-```
-
-## 🔑 Environment Variables
-
-Create `.env` in root:
-
-```env
-NODE_ENV=production
-PORT=3000
-SPOTIFY_CLIENT_ID=your_client_id
-SPOTIFY_CLIENT_SECRET=your_client_secret
-SPOTIFY_REDIRECT_URI=https://app.mv42.dev/lm/callback
-FIREBASE_SERVICE_ACCOUNT={"type":"service_account",...}
-```
-
-## 📋 Useful Commands
-
-```bash
-# View logs
-pm2 logs mv42-unified
-
-# Restart application
-pm2 restart mv42-unified
-
-# Manual deployment
-cd /srv/mv42 && ./deploy/deploy.sh
-
-# Check PM2 status
-pm2 status
-
-# Monitor resources
-pm2 monit
-```
+---
 
 ## 📄 License
 
-MIT
+MIT — Feel free to use this architecture for your own projects!
+
+---
+
+## 📬 Contact
+
+**MV42** — [GitHub](https://github.com/MV42)
