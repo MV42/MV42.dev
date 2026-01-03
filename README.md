@@ -37,13 +37,14 @@ MV42.dev/
 
 ## 🌐 Routing
 
-Single Node.js server (port 3000) serves everything:
+Single Node.js server (port 3000) with host-based landing pages:
 
-- **mv42.dev** → Static portfolio (`/web/public/`)
-- **app.mv42.dev** → Spotify widget (`/lm`)
+- **mv42.dev** → Portal (links to App & Web spaces)
+- **app.mv42.dev** → Apps gallery (`app-gallery.html`) + Spotify widget (`/lm`)
+- **web.mv42.dev** → Web projects gallery (`web-gallery.html`) + portfolio static files
 - **mv42.dev/hooks/** → Webhook endpoint (internal)
 
-Nginx handles SSL termination and proxies to port 3000.
+Nginx handles SSL termination and proxies to port 3000 for all hosts.
 
 ## 🚀 Local Development
 

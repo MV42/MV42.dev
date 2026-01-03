@@ -38,11 +38,14 @@ jobs:
             # Test and reload nginx
             sudo nginx -t && sudo systemctl reload nginx
             
-            echo "🚀 Starting/Reloading PM2..."
-            # Stop existing processes if any
-            pm2 delete mv42-unified 2>/dev/null || true
+            echo "🚀 Ensuring PM2 is available..."
+            command -v pm2 >/dev/null 2>&1 || sudo npm install -g pm2
             
-            # Start with ecosystem config
+            echo "🚀 Starting/Reloading PM2..."
+            # Stop all existing processes to avoid old apps
+            pm2 delete all 2>/dev/null || true
+            
+            # Start with ecosystem config (root index.js serves /)
             pm2 start /srv/mv42/deploy/ecosystem.config.js
             pm2 save
             

@@ -5,25 +5,41 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Paths
+const STATIC_DIR = path.join(__dirname, 'web/public');
+const PORTAL_PAGE = path.join(STATIC_DIR, 'portal.html');
+const WEB_GALLERY = path.join(STATIC_DIR, 'web-gallery.html');
+const APP_GALLERY = path.join(STATIC_DIR, 'app-gallery.html');
+
 // Import app modules
 const spotifyApp = require('./app/lm/server/index.js');
 
 // --- APPS MOUNTING ---
 
-// 1. Spotify Widget (/lm) - mounted on app.mv42.dev subdomain
+// 1. Spotify Widget (/lm)
 app.use('/lm', spotifyApp.router);
 
-// 2. Static Web Portfolio - mounted on mv42.dev main domain
-app.use(express.static(path.join(__dirname, 'web/public')));
-
-// Route principale - portfolio homepage
+// 2. Host-based landing pages
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'web/public', 'index.html'));
+    const host = (req.headers.host || '').toLowerCase();
+
+    if (host.startsWith('web.')) {
+        return res.sendFile(WEB_GALLERY);
+    }
+
+    if (host.startsWith('app.')) {
+        return res.sendFile(APP_GALLERY);
+    }
+
+    return res.sendFile(PORTAL_PAGE);
 });
+
+// Static assets for all hosts
+app.use(express.static(STATIC_DIR));
 
 // 404 handler
 app.use((req, res) => {
-    res.status(404).sendFile(path.join(__dirname, 'web/public', '404.html'));
+    res.status(404).sendFile(path.join(STATIC_DIR, '404.html'));
 });
 
 // --- STARTUP ---
