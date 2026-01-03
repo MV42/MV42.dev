@@ -1,74 +1,44 @@
-# MV42 Apps Server
+# App Modules
 
-Backend applications and services for app.mv42.dev
+Application modules mounted on the main server.
 
-## 🎯 Purpose
+## Spotify Widget (`/lm`)
 
-This server hosts various applications and APIs that complement the main portfolio:
-- **Spotify Widget** (`/lm`) - "Last Music" real-time listening tracker
-- **Future Apps** - ChatCast, Discord bot integration, etc.
+Real-time music listening tracker using Spotify API.
 
-## 🏗️ Structure
+### Features
 
-```
-├── index.js          # Main Express server
-├── package.json      # Dependencies
-└── lm/               # Spotify "Last Music" widget
-    └── server/
-        ├── index.js  # Spotify API integration
-        └── persist/  # Token storage (node-persist)
-```
+- OAuth2 authentication flow
+- Multi-user token management
+- Firebase push notifications (optional)
+- Persistent storage with node-persist
 
-## 🚀 Running Locally
+### API Endpoints
 
-```bash
-npm install
-npm start           # Production mode
-npm run dev         # Development with hot reload
-```
+- `GET /lm/login` - Start OAuth flow
+- `GET /lm/callback` - OAuth callback
+- `GET /lm/api/status` - Current listening status
 
-Server starts on `http://localhost:3000`
+### Configuration
 
-## 🔑 Environment Variables
-
-Create a `.env` file:
+Requires environment variables in root `.env`:
 
 ```env
-PORT=3000
-SPOTIFY_CLIENT_ID=your_client_id
-SPOTIFY_CLIENT_SECRET=your_client_secret
+SPOTIFY_CLIENT_ID=...
+SPOTIFY_CLIENT_SECRET=...
 SPOTIFY_REDIRECT_URI=https://app.mv42.dev/lm/callback
-FIREBASE_SERVICE_ACCOUNT={"type":"service_account",...}
+FIREBASE_SERVICE_ACCOUNT={...}
 ```
 
-## 📡 API Endpoints
+### Storage
 
-### Spotify Widget (`/lm`)
+- Tokens stored in `lm/server/persist/` (gitignored)
+- Firebase credentials in `lm/server/serviceAccountKey.json` (gitignored)
 
-- **GET `/lm/login`** - OAuth login flow
-- **GET `/lm/callback`** - OAuth callback handler
-- **GET `/lm/api/status`** - Current listening status for all users
+## Future Modules
 
-## 🔧 Dependencies
+- ChatCast
+- Discord bot integration
+- Other web services
 
-- `express` - Web framework
-- `spotify-web-api-node` - Spotify API wrapper
-- `node-persist` - Local storage for tokens
-- `firebase-admin` - Push notifications (optional)
-- `dotenv` - Environment configuration
-
-## 🌐 Deployment
-
-Runs on the same DigitalOcean VPS as the web server:
-
-```bash
-cd app
-npm install
-pm2 start index.js --name mv42-apps
-```
-
-**Nginx config** routes `app.mv42.dev` → `localhost:3000`
-
-## 📄 License
-
-MIT
+All modules are mounted on the main unified server in `/index.js`.

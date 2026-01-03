@@ -1,93 +1,146 @@
 # MV42.dev
 
-Personal portfolio and Node.js services hosted on a single DigitalOcean VPS ($4/month).
+**Unified VPS architecture** - Portfolio + Apps on a single DigitalOcean VPS ($4/month).
 
 ## 🏗️ Architecture
 
-This repository contains two separate Node.js applications running on the same VPS:
+**1 repo • 1 server • 1 source of truth**
 
 ```
-├── app/              # App server → app.mv42.dev
-│   ├── index.js      # Apps-only Express server (port 3000)
-│   ├── package.json
-│   └── lm/           # Spotify "Last Music" widget
+MV42.dev/
+├── index.js              # Unified Express server
+├── package.json          # All dependencies
+├── .env                  # Environment variables (not committed)
+│
+├── app/                  # Application modules
+│   └── lm/               # Spotify "Last Music" widget
 │       └── server/
-└── web/              # Web server → mv42.dev
-    ├── index.js      # Static portfolio server (port 3001)
-    ├── package.json
-    └── public/       # Static files
-        ├── index.html
-        ├── portfolio.css
-        ├── CV/       # CV project
-        ├── FOV/      # FOV Calculator
-        └── OptiTime/ # OptiTime project
+│           ├── index.js
+│           └── persist/  # Token storage (gitignored)
+│
+├── web/                  # Static portfolio
+│   └── public/
+│       ├── index.html
+│       ├── portfolio.css
+│       ├── CV/
+│       ├── FOV/
+│       └── OptiTime/
+│
+├── deploy/               # Deployment automation
+│   ├── ecosystem.config.js   # PM2 configuration
+│   ├── deploy.sh             # Auto-deploy script
+│   └── webhook.json          # GitHub webhook config
+│
+└── nginx/                # Reverse proxy config
+    └── mv42.conf         # Nginx site configuration
 ```
 
-**VPS Setup:**
-- Both apps run on the same DigitalOcean VPS
-- Reverse proxy (Nginx/Caddy) routes traffic:
-  - `app.mv42.dev` → port 3000 (app server)
-  - `mv42.dev` → port 3001 (web server)
-- Process manager (PM2) keeps both servers running
+## 🌐 Routing
 
-## 🚀 Quick Start
+Single Node.js server (port 3000) serves everything:
 
-### Development (Local)
+- **mv42.dev** → Static portfolio (`/web/public/`)
+- **app.mv42.dev** → Spotify widget (`/lm`)
+- **mv42.dev/hooks/** → Webhook endpoint (internal)
+
+Nginx handles SSL termination and proxies to port 3000.
+
+## 🚀 Local Development
 
 ```bash
-# Run the app server (port 3000)
-cd app
+git clone https://github.com/MV42/MV42.dev.git
+cd MV42.dev
 npm install
+cp .env.example .env  # Create and configure
 npm start
-
-# Run the web server (port 3001 to avoid conflict)
-cd web
-npm install
-PORT=3001 npm start
 ```
 
-### Production (DigitalOcean VPS)
+Server starts on `http://localhost:3000`
+
+## 📦 Production Deployment
+
+### Initial Setup (VPS)
 
 ```bash
-# Start both servers with PM2
-cd app
-pm2 start index.js --name mv42-apps
+# 1. Clone repository
+cd /srv
+git clone https://github.com/MV42/MV42.dev.git mv42
+cd /srv/mv42
 
-cd ../web
-pm2 start index.js --name mv42-web -- --port 3001
+# 2. Install dependencies
+npm install --omit=dev
 
-# Save PM2 configuration
+# 3. Create sensitive files
+nano .env
+nano app/lm/server/serviceAccountKey.json
+
+# 4. Start with PM2
+pm2 start deploy/ecosystem.config.js
 pm2 save
 pm2 startup
+
+# 5. Configure Nginx
+sudo cp nginx/mv42.conf /etc/nginx/sites-available/mv42
+sudo ln -s /etc/nginx/sites-available/mv42 /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+
+# 6. Setup webhook listener
+sudo apt install -y webhook
+webhook -hooks /srv/mv42/deploy/webhook.json -port 9000 -daemon
+
+# 7. Make deploy script executable
+chmod +x deploy/deploy.sh
 ```
 
-**Reverse Proxy Example (Nginx):**
-```nginx
-server {
-    server_name app.mv42.dev;
-    location / {
-        proxy_pass http://localhost:3000;
-    }
-}
+### GitHub Webhook Setup
 
-server {
-    server_name mv42.dev;
-    location / {
-        proxy_pass http://localhost:3001;
-    }
-}
+1. Go to **Settings → Webhooks** on GitHub
+2. Add webhook:
+   - URL: `https://mv42.dev/hooks/mv42-deploy`
+   - Content type: `application/json`
+   - Secret: Same as in `deploy/webhook.json`
+   - Events: `push` on `main` branch
+
+### Auto-deployment
+
+Every push to `main` triggers automatic deployment:
+
+```bash
+git push origin main
+# → GitHub webhook → deploy.sh → git pull → npm install → pm2 reload
 ```
 
-## 📦 Requirements
+## 🔑 Environment Variables
 
-- Node.js >= 18.0.0
-- PM2 (process manager)
-- Nginx or Caddy (reverse proxy)
-- Environment variables (for app server):
-  - `SPOTIFY_CLIENT_ID`
-  - `SPOTIFY_CLIENT_SECRET`
-  - `SPOTIFY_REDIRECT_URI`
-  - `FIREBASE_SERVICE_ACCOUNT` (optional)
+Create `.env` in root:
+
+```env
+NODE_ENV=production
+PORT=3000
+SPOTIFY_CLIENT_ID=your_client_id
+SPOTIFY_CLIENT_SECRET=your_client_secret
+SPOTIFY_REDIRECT_URI=https://app.mv42.dev/lm/callback
+FIREBASE_SERVICE_ACCOUNT={"type":"service_account",...}
+```
+
+## 📋 Useful Commands
+
+```bash
+# View logs
+pm2 logs mv42-unified
+
+# Restart application
+pm2 restart mv42-unified
+
+# Manual deployment
+cd /srv/mv42 && ./deploy/deploy.sh
+
+# Check PM2 status
+pm2 status
+
+# Monitor resources
+pm2 monit
+```
 
 ## 📄 License
 

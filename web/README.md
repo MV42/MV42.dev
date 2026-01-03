@@ -1,70 +1,50 @@
-# MV42 Portfolio Website
+# Web Portfolio
 
-Static portfolio and project showcase hosted at mv42.dev
+Static portfolio files served by the main server.
 
-## 🎯 Purpose
-
-Main portfolio website serving static HTML/CSS/JS content, including:
-- Personal portfolio landing page
-- Interactive CV
-- FOV Calculator for gaming
-- OptiTime scheduling tool
-
-## 🏗️ Structure
+## Structure
 
 ```
-├── index.js          # Express static file server
-├── package.json      # Minimal dependencies
-└── public/           # Static assets
-    ├── index.html    # Portfolio landing page
-    ├── portfolio.css
-    ├── auto-fit-text.css
-    ├── auto-fit-text.js
-    ├── 404.html
-    ├── CV/           # Interactive CV project
-    │   └── index.html
-    ├── FOV/          # Field of View calculator
-    │   └── index.html
-    └── OptiTime/     # Time optimization tool
-        ├── index.html
-        ├── script.js
-        └── style.css
+public/
+├── index.html        # Portfolio landing page
+├── portfolio.css
+├── auto-fit-text.css
+├── auto-fit-text.js
+├── 404.html
+│
+├── CV/               # Interactive CV
+│   └── index.html
+│
+├── FOV/              # Field of View calculator
+│   └── index.html
+│
+└── OptiTime/         # Time optimization tool
+    ├── index.html
+    ├── script.js
+    └── style.css
 ```
 
-## 🚀 Running Locally
+## Serving
 
-```bash
-npm install
-npm start
+Static files are served by the main Express server at `/index.js`:
+
+```javascript
+app.use(express.static(path.join(__dirname, 'web/public')));
 ```
 
-Server starts on `http://localhost:3000`
+## Access
 
-## 🔧 Features
+- **Portfolio**: `https://mv42.dev/`
+- **CV**: `https://mv42.dev/CV/`
+- **FOV Calculator**: `https://mv42.dev/FOV/`
+- **OptiTime**: `https://mv42.dev/OptiTime/`
 
-- Simple Express static file server
-- Custom 404 error page
-- Zero configuration needed
-- Lightweight and fast
+## Features
 
-## 🌐 Deployment
+- Zero build process
+- Pure HTML/CSS/JS
+- No dependencies
+- Fast and lightweight
+- Custom 404 page
 
-Runs on the same DigitalOcean VPS as the app server:
-
-```bash
-cd web
-npm install
-PORT=3001 pm2 start index.js --name mv42-web
-```
-
-**Nginx config** routes `mv42.dev` → `localhost:3001`
-
-## 📦 Dependencies
-
-- `express` - Static file serving
-
-Minimal dependencies for maximum performance.
-
-## 📄 License
-
-MIT
+All routing handled by Nginx → Express static middleware.

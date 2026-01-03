@@ -5,11 +5,13 @@ node_modules/
 .env
 .env.local
 .env.*.local
+.env.*
 
 # Logs
 logs/
 *.log
 npm-debug.log*
+pm2.log
 
 # OS files
 .DS_Store
@@ -23,6 +25,12 @@ Thumbs.db
 dist/
 build/
 
-# Secrets
-lm/server/serviceAccountKey.json
-lm/android/app/google-services.json
+# Secrets & sensitive files
+app/lm/server/serviceAccountKey.json
+app/lm/server/persist/
+*.pem
+*.key
+
+# PM2
+.pm2/
+
