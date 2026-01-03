@@ -9,7 +9,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy via SSH
+      - name: Deploy and setup VPS
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -17,9 +17,35 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
+            set -e
+            
+            echo "📥 Pulling latest code..."
             cd /srv/mv42
             git fetch origin
             git reset --hard origin/main
+            
+            echo "📦 Installing dependencies..."
             npm install --omit=dev
-            pm2 reload deploy/ecosystem.config.js
-            echo "✅ Deployment completed!"
+            
+            echo "🔧 Setting up Nginx..."
+            # Copy and link nginx config
+            sudo cp /srv/mv42/nginx/mv42.conf /etc/nginx/sites-available/mv42
+            sudo ln -sf /etc/nginx/sites-available/mv42 /etc/nginx/sites-enabled/mv42
+            
+            # Update SSL paths to use mv42.dev certificate
+            sudo sed -i 's|/etc/letsencrypt/live/app.mv42.dev/|/etc/letsencrypt/live/mv42.dev/|g' /etc/nginx/sites-available/mv42
+            
+            # Test and reload nginx
+            sudo nginx -t && sudo systemctl reload nginx
+            
+            echo "🚀 Starting/Reloading PM2..."
+            # Stop existing processes if any
+            pm2 delete mv42-unified 2>/dev/null || true
+            
+            # Start with ecosystem config
+            pm2 start /srv/mv42/deploy/ecosystem.config.js
+            pm2 save
+            
+            echo "✅ Deployment completed successfully!"
+            echo ""
+            pm2 status
