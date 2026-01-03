@@ -1,4 +1,4 @@
-name: Deploy to Infomaniak
+name: Deploy to DigitalOcean VPS
 
 on:
   push:
@@ -17,8 +17,9 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            cd /sites/mv42.dev
+            cd /srv/mv42
             git fetch origin
             git reset --hard origin/main
-            npm install
-            echo "✅ Déploiement terminé !"
+            npm install --omit=dev
+            pm2 reload deploy/ecosystem.config.js
+            echo "✅ Deployment completed!"
