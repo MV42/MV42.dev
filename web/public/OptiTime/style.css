@@ -20,7 +20,7 @@ body {
     align-items: flex-start;
     min-height: 100vh;
     color: var(--text);
-    font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+    font-family: 'Roboto Mono', monospace;
     margin: 0;
     padding: 20px;
     overflow: auto;
@@ -150,7 +150,7 @@ header#controls {
     font-size: 1.2em;
     font-weight: 600;
     color: var(--text);
-    font-family: 'Courier New', monospace;
+    font-family: 'Roboto Mono', monospace;
     padding: 10px 15px;
     background: rgba(0, 0, 0, 0.02);
     border-radius: 8px;
@@ -345,7 +345,7 @@ header#controls {
     font-size: 1.1em;
     font-weight: 600;
     color: var(--text);
-    font-family: 'Courier New', monospace;
+    font-family: 'Roboto Mono', monospace;
 }
 
 /* Container principal des horloges */

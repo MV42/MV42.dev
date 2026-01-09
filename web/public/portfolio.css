@@ -1,7 +1,7 @@
 body, html {
     height: 100%;
     margin: 0;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Roboto Mono', monospace;
     background-color: #e0e5ec;
     display: flex;
     justify-content: center;
@@ -25,7 +25,7 @@ h1 {
     font-weight: 700;
     color: #4a5668;
     text-transform: uppercase;
-    letter-spacing: 0.05em; /* Réduit l'espacement des lettres */
+    letter-spacing: 0.08em; /* Increased for monospace readability */
     margin: 0;
     padding: 20px 15px; /* Plus de padding pour sécurité */
     width: 100%; /* Prend toute la largeur du container */
@@ -46,15 +46,16 @@ h1 {
 }
 
 h2 {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     color: #4a5668;
     margin-bottom: 10px;
 }
 
 p {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: #5a677b;
     margin-bottom: 30px;
+    line-height: 1.5;
 }
 
 .portal-buttons {
@@ -77,7 +78,7 @@ p {
     color: #4a5668;
     text-decoration: none;
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 0.95rem;
     transition: all 0.3s ease;
     min-width: 140px;
 }
@@ -152,11 +153,11 @@ p {
     } */
 
     h2 {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
     }
 
     p {
-        font-size: 1rem;
+        font-size: 0.95rem;
     }
 
     .social-icon {

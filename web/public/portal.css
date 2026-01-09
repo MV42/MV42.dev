@@ -11,7 +11,7 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-  font-family: 'Montserrat', system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: 'Roboto Mono', monospace;
   background: var(--bg);
   color: var(--fg);
   min-height: 100vh;
@@ -27,15 +27,15 @@ body {
 
 header h1 { 
   margin: 0 0 12px; 
-  font-size: 2rem; 
+  font-size: 1.8rem; 
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
 }
 header p { 
   margin: 0 0 24px; 
   color: var(--muted); 
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 header .pill {
   display: inline-block;
@@ -79,13 +79,14 @@ header .pill {
 
 .card h2 { 
   margin: 0 0 8px; 
-  font-size: 1.5rem; 
+  font-size: 1.3rem; 
   font-weight: 700;
 }
 .card p { 
   margin: 0; 
   color: var(--muted); 
-  font-size: 1rem;
+  font-size: 0.95rem;
+  line-height: 1.4;
 }
 
 .pill {
@@ -108,12 +109,15 @@ a.pill:hover {
 
 @media (max-width: 640px) {
   body { padding: 16px; }
-  header h1 { font-size: 1.6rem; }
+  header h1 { font-size: 1.4rem; }
+  header p { font-size: 0.9rem; }
   .card { 
     flex-direction: column; 
     align-items: flex-start; 
     padding: 20px;
   }
+  .card h2 { font-size: 1.2rem; }
+  .card p { font-size: 0.85rem; }
   .grid {
     grid-template-columns: 1fr;
   }
