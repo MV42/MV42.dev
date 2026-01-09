@@ -26,8 +26,8 @@ dist/
 build/
 
 # Secrets & sensitive files
-app/lm/server/serviceAccountKey.json
-app/lm/server/persist/
+app/GroupLink/server/serviceAccountKey.json
+app/GroupLink/server/persist/
 *.pem
 *.key
 

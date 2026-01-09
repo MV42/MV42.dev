@@ -18,7 +18,7 @@ Web projects gallery featuring:
 
 ### [app.mv42.dev](https://app.mv42.dev)
 Applications and services:
-- **[Spotify Widget](https://app.mv42.dev/lm/login)** — Real-time music listening tracker
+- **[GroupLink](https://app.mv42.dev/GroupLink/login)** — Spotify group listening tracker
 - More apps coming soon...
 
 ---
@@ -52,7 +52,7 @@ MV42.dev/
 ├── package.json          # Dependencies
 │
 ├── app/                  # Application modules
-│   └── lm/               # Spotify "Last Music" widget
+│   └── GroupLink/        # Spotify group listening tracker
 │
 ├── web/                  # Static web projects
 │   └── public/

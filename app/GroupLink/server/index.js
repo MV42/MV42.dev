@@ -34,7 +34,7 @@ const router = express.Router();
 const CREDENTIALS = {
     clientId: process.env.SPOTIFY_CLIENT_ID || 'TON_CLIENT_ID_ICI',
     clientSecret: process.env.SPOTIFY_CLIENT_SECRET || 'TON_CLIENT_SECRET_ICI',
-    redirectUri: process.env.SPOTIFY_REDIRECT_URI || 'https://mv42.dev/lm/callback'
+    redirectUri: process.env.SPOTIFY_REDIRECT_URI || 'https://app.mv42.dev/GroupLink/callback'
 };
 
 // Stockage (Tokens + Historique)

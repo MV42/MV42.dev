@@ -12,12 +12,12 @@ const WEB_GALLERY = path.join(STATIC_DIR, 'web-gallery.html');
 const APP_GALLERY = path.join(STATIC_DIR, 'app-gallery.html');
 
 // Import app modules
-const spotifyApp = require('./app/lm/server/index.js');
+const groupLinkApp = require('./app/GroupLink/server/index.js');
 
 // --- APPS MOUNTING ---
 
-// 1. Spotify Widget (/lm)
-app.use('/lm', spotifyApp.router);
+// 1. GroupLink (/GroupLink)
+app.use('/GroupLink', groupLinkApp.router);
 
 // 2. Host-based landing pages
 app.get('/', (req, res) => {
@@ -47,16 +47,16 @@ app.use((req, res) => {
     try {
         console.log("🚀 Starting MV42 unified VPS server...");
 
-        // Initialize Spotify storage
-        await spotifyApp.initStorage();
-        spotifyApp.startPollingLoop();
-        console.log("✅ Spotify Widget loaded on /lm");
+        // Initialize GroupLink storage
+        await groupLinkApp.initStorage();
+        groupLinkApp.startPollingLoop();
+        console.log("✅ GroupLink loaded on /GroupLink");
 
         // Start Express server
         app.listen(PORT, () => {
             console.log(`\n🌍 MV42 Server running on port ${PORT}`);
-            console.log(`👉 Portfolio: http://localhost:${PORT}/`);
-            console.log(`👉 Spotify: http://localhost:${PORT}/lm/login`);
+            console.log(`👉 Portal: http://localhost:${PORT}/`);
+            console.log(`👉 GroupLink: http://localhost:${PORT}/GroupLink/login`);
         });
 
     } catch (e) {

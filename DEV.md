@@ -69,13 +69,13 @@ NODE_ENV=production
 PORT=3000
 SPOTIFY_CLIENT_ID=your_spotify_client_id
 SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
-SPOTIFY_REDIRECT_URI=https://app.mv42.dev/lm/callback
+SPOTIFY_REDIRECT_URI=https://app.mv42.dev/GroupLink/callback
 FIREBASE_SERVICE_ACCOUNT={"type":"service_account",...}
 ```
 
 **Optional:** Add Firebase service account key for push notifications:
 ```bash
-nano app/lm/server/serviceAccountKey.json
+nano app/GroupLink/server/serviceAccountKey.json
 # Paste your Firebase service account JSON
 ```
 
@@ -139,7 +139,7 @@ pm2 logs          # Check for errors
 curl -I https://mv42.dev           # Portal
 curl -I https://web.mv42.dev       # Web gallery
 curl -I https://app.mv42.dev       # Apps gallery
-curl -I https://app.mv42.dev/lm/login  # Spotify widget
+curl -I https://app.mv42.dev/GroupLink/login  # GroupLink
 ```
 
 ---
@@ -296,7 +296,7 @@ sudo certbot renew --force-renewal
 
 **Single unified Node.js server** (`index.js`) on port 3000:
 - Host-based routing (portal, web gallery, app gallery)
-- Spotify widget mounted on `/lm`
+- GroupLink mounted on `/GroupLink`
 - Static files served from `web/public/`
 
 **Nginx** handles:
