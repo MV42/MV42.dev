@@ -16,6 +16,9 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
+          envs: ENV_FILE
+        env:
+          ENV_FILE: ${{ secrets.ENV_FILE }}
           script: |
             set -e
             
@@ -24,7 +27,9 @@ jobs:
             git fetch origin
             git reset --hard origin/main
             
-            echo "📦 Installing dependencies..."
+            echo "🔐 Creating .env from ENV_FILE secret..."
+            printf "%s\n" "${ENV_FILE}" > /srv/mv42/.env
+            echo "✅ .env file created"            echo "📦 Installing dependencies..."
             npm install --omit=dev
             
             echo "🔧 Setting up Nginx..."

@@ -157,14 +157,37 @@ cat ~/.ssh/github_deploy.pub >> ~/.ssh/authorized_keys
 cat ~/.ssh/github_deploy  # Copy this private key
 ```
 
-2. Add secrets to GitHub repository:
-   - Go to `https://github.com/MV42/MV42.dev/settings/secrets/actions`
-   - Add three secrets:
-     - `SSH_HOST` → Your VPS IP address
-     - `SSH_USERNAME` → `root` or your SSH user
-     - `SSH_PRIVATE_KEY` → Content of `~/.ssh/github_deploy`
+2. Get your Spotify API credentials:
+   - Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+   - Create an app or use existing one
+   - Copy **Client ID** and **Client Secret**
+   - In **Edit Settings** → **Redirect URIs**, add: `https://app.mv42.dev/GroupLink/callback`
 
-3. **(If not using root)** Add sudo permissions for nginx:
+3. Create the `ENV_FILE` secret:
+   
+   - Go to `https://github.com/MV42/MV42.dev/settings/secrets/actions`
+   - Click **New repository secret**
+   - Name: `ENV_FILE`
+   - Value: Paste your complete `.env` content:
+   
+   ```dotenv
+   NODE_ENV=production
+   PORT=3000
+   SPOTIFY_CLIENT_ID=your_client_id
+   SPOTIFY_CLIENT_SECRET=your_client_secret
+   SPOTIFY_REDIRECT_URI=https://app.mv42.dev/GroupLink/callback
+   FIREBASE_SERVICE_ACCOUNT={"type":"service_account","project_id":"..."}
+   # Add any other environment variables here
+   ```
+   
+   **This is the only application secret you need.** The workflow automatically creates `/srv/mv42/.env` from this on every deploy.
+
+4. Ensure SSH secrets are configured:
+   
+   You also need these secrets for deployment (set once):
+   - `SSH_HOST` → Your VPS IP address
+   - `SSH_USERNAME` → `root` or your SSH user
+   - `SSH_PRIVATE_KEY` → Content of `~/.ssh/github_deploy`5. **(If not using root)** Add sudo permissions for nginx:
 ```bash
 sudo visudo
 # Add this line (replace 'youruser'):
@@ -175,11 +198,14 @@ youruser ALL=(ALL) NOPASSWD: /usr/bin/nginx, /usr/sbin/nginx, /bin/systemctl, /u
 
 On every push to `main`, the workflow:
 1. Connects to VPS via SSH
-2. Pulls latest code (`git reset --hard origin/main`)
-3. Installs dependencies (`npm install --omit=dev`)
-4. Updates Nginx configuration
-5. Reloads Nginx
-6. Restarts PM2 process
+2. Creates `/srv/mv42/.env` from the `ENV_FILE` secret
+3. Pulls latest code (`git reset --hard origin/main`)
+4. Installs dependencies (`npm install --omit=dev`)
+5. Updates Nginx configuration
+6. Reloads Nginx
+7. Restarts PM2 process
+
+**To add/change environment variables:** Edit the `ENV_FILE` secret on GitHub, then push any commit (or manually re-run the workflow).
 
 Check deployment status: `https://github.com/MV42/MV42.dev/actions`
 
